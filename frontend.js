@@ -1,7 +1,7 @@
 var startFrontend = function() {
-	// start express server
+  // start express server
 };
 
 module.exports = {
-	startFrontend: startFrontend
+  startFrontend: startFrontend
 };

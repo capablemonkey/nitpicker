@@ -3,5 +3,5 @@ var startScreenr = function() {
 };
 
 module.exports = {
-	startScreenr: startScreenr
+  startScreenr: startScreenr
 };
