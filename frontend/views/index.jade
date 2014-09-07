@@ -1,7 +1,7 @@
 extends layout
 
 block content
-  h1= nitpicker
+  h1 nitpicker
   p Welcome to nitpicker
 
   .statusDashboard
@@ -16,3 +16,18 @@ block content
         a Sandbox
         span= sandboxMessage
         img(src=(sandboxOk ? "/images/status/green.png" : "/images/status/red.png"))
+
+  #timeline
+    each event in events
+      ul
+        li Event: 
+          = event.description
+
+  #log
+    each result in results
+      ul
+        li Test Result: 
+          = result.testId 
+          |  | Response time: 
+          = result.responseTime
+          |  ms
