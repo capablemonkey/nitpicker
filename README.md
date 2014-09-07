@@ -7,21 +7,24 @@
 ### TestResult
 
 ```js
- testResult : {
-    this.testId : null;
-	this.error : null;
- 	this.timeStart : null;
- 	this.timeEnd : null;
- 	this.responseTime : null;
- 	this.responseCode : null;
- 	this.response : {
- 		code: null,
- 		body: null,
- 		headers: null
- 	};
- 	this.serviceName: null;//production or sandbox
- 	this.id : null; // database id
- }
+var TestResultSchema = new Schema({
+     this.testId :  String, // actual type of test
+     this.error : String, 
+     this.timeStart : Date,
+     this.timeEnd : Date,
+     this.timeResponse: Number,
+     this.response : {
+         code: Number,
+         body: String,
+         headers: String,
+     },
+     this.serviceName : String,
+     this.id : Schema.Types.ObjectId
+     this.Anomaly : {
+        errorMessage: String,
+        attributesThatFailed: [String]
+     }
+});
 ```
 
 ### Test
