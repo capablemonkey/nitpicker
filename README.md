@@ -32,7 +32,7 @@ module.exports.sandbox = {
 		code: function(done) {
 
 		},
-		criteria: function(error, response, done) {
+		criteria: function(testResult, done) {
 
 		}
 	}
