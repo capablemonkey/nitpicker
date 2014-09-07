@@ -1,6 +1,7 @@
 var tests = require('./tests/tests.js');
 var config = require('./config.js');
 var _ = require('underscore');
+var db = require('./database');
 
 var startWorker = function() {
   _.each(tests, function(service) {
@@ -28,8 +29,7 @@ function runTest(test, name, service) {
     console.log(err);
     console.log(response);
 
-    var testResult = {
-      id: null, // database id
+    var testResult = new db.TestResult({
       testId: name,
       serviceName: service, //production or sandbox
       error: err,
@@ -41,7 +41,11 @@ function runTest(test, name, service) {
         body: response,
         headers: null
       }
-    };
+    });
+
+    // TODO: tack on the document ID when you pass to queue.
+
+    testResult.save();
 
     console.log(testResult);
 
