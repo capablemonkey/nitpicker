@@ -4,6 +4,8 @@ var should = require('should');
 
 dwolla.sandbox = config.sandbox;
 
+var counter = 0;
+
 module.exports.sandbox = {
 	'get balance': {
 		config: {
@@ -29,8 +31,6 @@ module.exports.sandbox = {
 			responseTimeThreshold: 5000
 		},
 		execute: function(done) {
-			var counter = 0;
-
 			dwolla.setToken(config.accessToken);
       /* 
       	causes the first five calls to be very slow.
