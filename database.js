@@ -9,7 +9,7 @@ var TestResultSchema = new Schema({
      error : String, 
      timeStart : Date,
      timeEnd : Date,
-     timeResponse: Number,
+     responseTime: Number,
      response : {
          code: Number,
          body: Schema.Types.Mixed,
@@ -17,6 +17,14 @@ var TestResultSchema = new Schema({
      },
      serviceName : String,
      anomaly : String
+});
+
+var Event = new Schema({
+    description: String,
+    updates: [],
+    resolved: Boolean,
+    createdDate: Date,
+    resolvedDate: Date
 });
 
 module.exports.TestResult = mongoose.model('TestResult', TestResultSchema);
