@@ -1,12 +1,9 @@
-# nitpicker
+var mongoose = require('mongoose');
 
-# Getting started
+mongoose.connect ('mongodb://localhost/my_database');
 
-`node app.js`
+var Schema = mongoose.Schema;
 
-### TestResult
-
-```js
 var TestResultSchema = new Schema({
      this.testId :  String, // actual type of test
      this.error : String, 
@@ -20,29 +17,11 @@ var TestResultSchema = new Schema({
      },
      this.serviceName : String,
      this.id : Schema.Types.ObjectId
-     this.Anomaly : {
+     this.anomaly : {
         errorMessage: String,
         attributesThatFailed: [String]
      }
 });
-```
 
-### Test
-We define tests for a particular environment, which is in this case `sandbox`.
+module.exports.TestResult = mongoose.model('TestResult', TestResultSchema);
 
-```js
-module.exports.sandbox = {
-	'get balance': {
-		config: {
-			responseTimeThreshold: 5000
-		},
-		code: function(done) {
-
-		},
-		criteria: function(testResult, done) {
-
-		}
-	}
-};
-```
-In the example above, we define the `get balance` test.
