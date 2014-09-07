@@ -21,7 +21,7 @@ module.exports.sandbox = {
 			response.should.be.a.Number
         .and.above(0);
 
-      done(true);
+      done();
 		}
 	}
 };
