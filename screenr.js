@@ -1,37 +1,26 @@
 var tests = require('./tests/tests.js');
+var database = require('./database.js');
 
-// function TestResult {
-//  this.testId =  null;
-//	this.error = null;
-// 	this.timeStart = null;
-// 	this.timeEnd = null;
-// 	this.responseTime = null;
-// 	this.responseCode = null;
-// 	this.response = {
-// 		code: null,
-// 		body: null,
-// 		headers: null
-// 	};
-//  this.serviceName = null;
-//  this.id = null;
-// }
-
-function Anomaly() {
-	this.testId = null;
-	this.testDatabaseId = null;
-	this.details = {
-		message: null
-		// other things?
-	};
-}
 
 // interface to contact notifyr
-function generateNotification() {
+function generateNotification(anomaly) {
 
 }
 
-function flagTestResult() {
-
+function flagTestResult(testResult, errorMessage) {
+    database.TestResult.findById(testResult.id, function(err, doc) {
+        if (err !== null) {
+            throw err;
+        } 
+        else if (doc !== null) {
+            doc.anomaly = errorMessage;
+            doc.save(function(err) {
+                throw err;
+            });
+        } else  {
+            throw 'somehow there was not an error, and not a doc from the db';
+        }
+    })
 }
 
 function evaluateTest(testResult) {
@@ -40,15 +29,8 @@ function evaluateTest(testResult) {
     
     testRoutine.criteria(testResult, function( successStatus, failureMessage ) {
     	if (successStatus === false) {
-    		
-
+            flagTestResult( testResult, failureMessage )
     	} 
-    	else if (successStatus === true) {
-    		// 
-    	} 
-    	else {
-    		// bad programming get's us here
-    	}
     })
 
 }
@@ -56,7 +38,7 @@ function evaluateTest(testResult) {
 var startScreenr = function(queue) {
 	queue.on('push',function() {
 		var testResult = queue.pop();
-		evaluateTest( test_result );
+		evaluateTest( testResult );
 	})
 };
 
