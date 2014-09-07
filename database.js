@@ -13,9 +13,9 @@ var TestResultSchema = new Schema({
   timeEnd : Date,
   responseTime: Number,
   response : {
-  code: Number,
-  body: Schema.Types.Mixed,
-  headers: String
+    code: Number,
+    body: Schema.Types.Mixed,
+    headers: String
   },
   serviceName : String,
   anomaly : String
@@ -30,7 +30,8 @@ var EventSchema = new Schema({
   updates: [],
   resolved: Boolean,
   createdDate: Date,
-  resolvedDate: Date
+  resolvedDate: Date,
+  testResults: []
 });
 
 /* expose the mongoose models

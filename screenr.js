@@ -10,20 +10,24 @@ var unhealthyTests = { /* tests which have open Events associated with them */
 /* triggers the beginning of an Event if one has not already begun for this
   test type. Also updates the testResult's anomaly message to the given text.*/
 function flagTestResult(testResult, errorMessage) {
-    //flag
-    if (unhealthyTests[testResult.serviceName][testResult.testId] === undefined) {
-      console.log('Event Begun!!',errorMessage);
-      createEvent(testResult, function(doc) {
-        unhealthyTests[testResult.serviceName][testResult.testId] = doc;
-      })
-    }
-      testResult.anomaly = errorMessage;
+    testResult.anomaly = errorMessage;
       testResult.save(function(err) { 
         if (err !== null) {
           throw err; 
         }
+    });
+
+    // create event if none is already created
+    if (unhealthyTests[testResult.serviceName][testResult.testId] === undefined) {
+      console.log('> Event created!', errorMessage);
+      createEvent(testResult, function(doc) {
+        unhealthyTests[testResult.serviceName][testResult.testId] = doc;
       });
+    }
 }
+
+// TODO: link flagged test results to an Event, so we can see which test results caused it.
+
 /* recieves a doc for a testResult and a callback,
  instantiates an Event for the given testResult's type of test
  and service. Saves the Event to the DB and passes the Event to
@@ -32,6 +36,7 @@ function createEvent(testResult, done) {
   var testEvent = new database.Event({
     description: testResult.anomaly,
     testId: testResult.testId,
+    testResults: [testResult],
     serviceName: testResult.serviceName,
     updates: [],
     resolved: false,
@@ -47,7 +52,7 @@ function createEvent(testResult, done) {
  and finds if any Events exist for this type of test
  if so, then resolve the EVent */
 function resolveEvent(testResult) {
-  console.log('Event resolved!!');
+  console.log('> Event resolved!');
   testEvent = unhealthyTests[testResult.serviceName][testResult.testId];
   /* there is a peculiarity available here... the Event
    object has an array of updates inside of it. The object stored
@@ -87,14 +92,14 @@ function validateTiming(testResult, done) {
     }
     averageTime /= docs.length;
 
-    console.log(averageTime , testRoutine.config.responseTimeThreshold)
+    console.log(testResult.testId, 'avg res. time: ', averageTime , 'threshold: ', testRoutine.config.responseTimeThreshold, 'closeness: ', averageTime / testRoutine.config.responseTimeThreshold);
     if (averageTime > testRoutine.config.responseTimeThreshold) {
       flagTestResult( testResult, "Service Response Time Too Long! (Average of last " + docs.length + " exceeded threshold)");
     } else {
       done();// no problems *always* called on successful test case
     }
 
-  })
+  });
 }
 /* two part evaluation of the testResult,
   first - runs the criteria (throw will occur with any issues)
@@ -111,10 +116,13 @@ function evaluateTest(testResult) {
   try {
     testRoutine.criteria(testResult,function() { 
       validateTiming(testResult, function() {
+
+        // if tests are OK, check to see if we can resolve the event
         if (unhealthyTests[testResult.serviceName][testResult.testId] !== undefined) {
           resolveEvent(testResult);
         }
-      })
+
+      });
     });
   } catch (e) {
     flagTestResult( testResult, e ); // logic error 
@@ -125,7 +133,7 @@ var startScreenr = function(queue) {
   queue.on('push',function() {
     var testResult = queue.pop();
     evaluateTest( testResult );
-  })
+  });
 };
 
 module.exports = {
