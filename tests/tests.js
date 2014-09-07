@@ -11,6 +11,10 @@ module.exports.sandbox = {
 		},
 		execute: function(done) {
 			dwolla.setToken(config.accessToken);
+      /* TODO: undo -- this code 
+      causes the first five calls to be very slow.
+      This is to test the functionality in screenr
+      to create and resolve Events */
       if (counter < 5) {
         counter++;
         setTimeout(function() {
