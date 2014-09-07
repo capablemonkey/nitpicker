@@ -12,7 +12,7 @@ var TestResultSchema = new Schema({
      timeResponse: Number,
      response : {
          code: Number,
-         body: String,
+         body: Schema.Types.Mixed,
          headers: String,
      },
      serviceName : String,
