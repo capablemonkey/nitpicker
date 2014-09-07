@@ -1,5 +1,6 @@
 {
-	"dependencies": {
-		"dwolla-node": "*"
-	}
+  "dependencies": {
+    "dwolla-node": "*",
+    "should": "^4.0.4"
+  }
 }
