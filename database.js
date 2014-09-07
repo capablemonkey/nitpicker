@@ -19,7 +19,7 @@ var TestResultSchema = new Schema({
      anomaly : String
 });
 
-var Event = new Schema({
+var EventSchema = new Schema({
     description: String,
     updates: [],
     resolved: Boolean,
@@ -28,4 +28,4 @@ var Event = new Schema({
 });
 
 module.exports.TestResult = mongoose.model('TestResult', TestResultSchema);
-
+module.exports.Event = mongoose.model('Event', EventSchema);
