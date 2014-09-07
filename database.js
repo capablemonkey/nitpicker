@@ -13,7 +13,7 @@ var TestResultSchema = new Schema({
      response : {
          code: Number,
          body: Schema.Types.Mixed,
-         headers: String,
+         headers: String
      },
      serviceName : String,
      anomaly : String
