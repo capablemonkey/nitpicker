@@ -3,12 +3,12 @@ var config = require('./config.js');
 var _ = require('underscore');
 var db = require('./database');
 
-var startWorker = function() {
-  _.each(tests, function(service) {
+var startWorker = function(queue) {
+  _.each(tests, function(service, serviceName) {
     _.each(service, function(test, name) {
 
       setInterval(function() {
-        runTest(test, name, service);
+        runTest(test, name, service, serviceName, queue);
       }, config.testInterval);
 
     });
@@ -17,7 +17,7 @@ var startWorker = function() {
 
 // TODO: run an entire Service every interval secs, which consists of a async.
 
-function runTest(test, name, service) {
+function runTest(test, name, service, serviceName, queue) {
   var beginTime = Date.now();
   console.log(beginTime, 'running test:', name);
 
@@ -31,7 +31,7 @@ function runTest(test, name, service) {
 
     var testResult = new db.TestResult({
       testId: name,
-      serviceName: service, //production or sandbox
+      serviceName: serviceName, //production or sandbox
       error: err,
       timeStart: Date(beginTime),
       timeEnd: Date(endTime),
@@ -42,12 +42,12 @@ function runTest(test, name, service) {
         headers: null
       }
     });
-
     // TODO: tack on the document ID when you pass to queue.
-
     testResult.save();
 
-    console.log(testResult);
+    console.log(testResult)
+
+    queue.push(testResult);
 
   });
 }

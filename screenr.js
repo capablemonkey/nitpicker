@@ -25,7 +25,7 @@ function flagTestResult(testResult, errorMessage) {
 
 function evaluateTest(testResult) {
     
-    var testRoutine = tests[testResult.serviceName][testResult.id];
+    var testRoutine = tests[testResult.serviceName][testResult.testId];
     
     testRoutine.criteria(testResult, function( successStatus, failureMessage ) {
     	if (successStatus === false) {
