@@ -2,32 +2,47 @@ var tests = require('./tests/tests.js');
 var config = require('./config.js');
 var _ = require('underscore');
 var db = require('./database');
+var async = require('async');
 
+// worker runs a batch of tests (called a Service)
+// in series every config.testInterval milliseconds
 var startWorker = function(queue) {
   _.each(tests, function(service, serviceName) {
-    _.each(service, function(test, name) {
 
-      setInterval(function() {
-        runTest(test, name, service, serviceName, queue);
-      }, config.testInterval);
+    setInterval(function() {
+      runTestsInSeries(service, serviceName, queue);
+    }, config.testInterval);
 
-    });
   });
 };
 
-// TODO: run an entire Service every interval secs, which consists of a async.
+// runs tests in series, waiting for each response to come back
+// before calling the next one.
 
-function runTest(test, name, service, serviceName, queue) {
+function runTestsInSeries(service, serviceName, screenrQueue) {
+  testNames = Object.keys(service);
+  var tests = testNames.map(function(testName) {
+    return function(cb) {runTest(service[testName], testName, serviceName, screenrQueue, cb);};
+  });
+
+  // TODO: set a time limit on the callback.  If one test
+  // takes abnormally long, we need to throw an error and keep going.
+
+  async.series(tests);
+}
+
+// runs .execute() on a test, stores response time and response
+// in a new TestResult
+
+function runTest(test, name, serviceName, screenrQueue, callback) {
   var beginTime = Date.now();
   console.log(beginTime, 'running test:', name);
 
   test.execute(function(err, response) {
     var endTime = Date.now();
-    var responseTime = (endTime - beginTime); // should be in ms
+    var responseTime = (endTime - beginTime); // time delta in ms
 
     // save err, response in new TestResult object.
-    console.log(err);
-    console.log(response);
 
     var testResult = new db.TestResult({
       testId: name,
@@ -42,13 +57,15 @@ function runTest(test, name, service, serviceName, queue) {
         headers: null
       }
     });
-    // TODO: tack on the document ID when you pass to queue.
+
     testResult.save();
 
-    console.log(testResult)
+    console.log(testResult);
 
-    queue.push(testResult);
+    // notify screenr of this new TestResult
+    screenrQueue.push(testResult);
 
+    callback();
   });
 }
 
