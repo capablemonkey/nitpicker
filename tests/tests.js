@@ -3,7 +3,7 @@ var dwolla = require('dwolla-node')(config.appKey, config.appSecret);
 var should = require('should');
 
 dwolla.sandbox = config.sandbox;
-
+var counter = 0;
 module.exports.sandbox = {
 	'get balance': {
 		config: {
@@ -11,7 +11,15 @@ module.exports.sandbox = {
 		},
 		execute: function(done) {
 			dwolla.setToken(config.accessToken);
-      dwolla.balance(done);
+      if (counter < 5) {
+        counter++;
+        setTimeout(function() {
+          dwolla.balance(done);
+        },6000);
+      } 
+      else {
+        dwolla.balance(done);
+      }
 		},
 		criteria: function(testResult, done) {
 			(testResult.error == null).should.be.true;
