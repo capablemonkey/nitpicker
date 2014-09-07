@@ -25,13 +25,15 @@ function flagTestResult(testResult, errorMessage) {
 
 function evaluateTest(testResult) {
     
+
     var testRoutine = tests[testResult.serviceName][testResult.id];
     try {
         testRoutine.criteria(testResult,function() {});
 
-    } catche (e) {
+    } catch (e) {
         flagTestResult( testResult, e );        
     }
+
 
 }
 
