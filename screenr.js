@@ -1,4 +1,4 @@
-var tests = require('tests/tests.js');
+var tests = require('./tests/tests.js');
 
 // function TestResult {
 //  this.testId =  null;
@@ -20,7 +20,7 @@ function Anomaly() {
 	this.testId = null;
 	this.testDatabaseId = null;
 	this.details = {
-		this.message = null;
+		message: null
 		// other things?
 	};
 }
