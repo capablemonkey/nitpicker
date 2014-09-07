@@ -19,5 +19,13 @@ var TestResultSchema = new Schema({
      anomaly : String
 });
 
+var Event = new Schema({
+    description: String,
+    updates: [],
+    resolved: Boolean,
+    createdDate: Date,
+    resolvedDate: Date
+});
+
 module.exports.TestResult = mongoose.model('TestResult', TestResultSchema);
 
