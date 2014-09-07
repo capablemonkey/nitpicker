@@ -9,7 +9,7 @@ var TestResultSchema = new Schema({
      error : String, 
      timeStart : Date,
      timeEnd : Date,
-     timeResponse: Number,
+     responseTime: Number,
      response : {
          code: Number,
          body: Schema.Types.Mixed,
