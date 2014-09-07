@@ -7,17 +7,21 @@
 ### TestResult
 
 ```js
-testResult = {
-	testId: null,
-	timeStart: null,
-	timeEnd: null,
-	responseTime: null,
-	response: {
-		code: null,
-		body: null,
-		headers: null
-	}
-};
+ testResult : {
+    this.testId : null;
+	this.error : null;
+ 	this.timeStart : null;
+ 	this.timeEnd : null;
+ 	this.responseTime : null;
+ 	this.responseCode : null;
+ 	this.response : {
+ 		code: null,
+ 		body: null,
+ 		headers: null
+ 	};
+ 	this.serviceName: null;//production or sandbox
+ 	this.id : null; // database id
+ }
 ```
 
 ### Test
