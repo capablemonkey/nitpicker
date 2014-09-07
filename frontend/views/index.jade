@@ -1,5 +1,18 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1= nitpicker
+  p Welcome to nitpicker
+
+  .statusDashboard
+    #prodStatus.statusBox
+      .statusHeading 
+        a Production
+        span= prodMessage
+        img(src=(prodOk ? "/images/status/green.png" : "/images/status/red.png"))
+
+    #sandboxStatus.statusBox
+      .statusHeading 
+        a Sandbox
+        span= sandboxMessage
+        img(src=(sandboxOk ? "/images/status/green.png" : "/images/status/red.png"))
