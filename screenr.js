@@ -6,12 +6,12 @@ var unhealthyTests = {};
 
 function flagTestResult(testResult, errorMessage) {
     //flag
-    if (unhealthyTests[TestResult.testId] === undefined) {
-      createEvent(TestResult, function(doc) {
+    if (unhealthyTests[testResult.testId] === undefined) {
+      console.log('Event Begun!!',errorMessage);
+      createEvent(testResult, function(doc) {
         unhealthyTests[testResult.testId] = doc;
       })
     }
-    console.log('test result flagged!!',errorMessage);
       testResult.anomaly = errorMessage;
       testResult.save(function(err) { 
         if (err !== null) {
@@ -20,7 +20,7 @@ function flagTestResult(testResult, errorMessage) {
       });
 }
 
-function createEvent(testResult) {
+function createEvent(testResult, done) {
   var testEvent = new database.Event({
     description: testResult.anomaly,
     updates: [],
@@ -28,58 +28,62 @@ function createEvent(testResult) {
     createdDate: new Date()
   });
   testEvent.save(function(err){
-    if (err !== undefined) throw err;
+    if (err !== null) throw err;
   });
+  done(testEvent);
 }
 
 function resolveEvent(testResult) {
-  if (unhealthyTests[testResult.testId] === undefined) return;
-  console.log('test result resolved!!');
+  console.log('Event resolved!!');
   testEvent = unhealthyTests[testResult.testId];
   testEvent.resolved = true;
   testEvent.resolvedDate = new Date();
-  delete unhealthyTests[TestResult.testId];
+  delete unhealthyTests[testResult.testId];
 }
 
+/* checks average of last five iterations of this test type,
+ if the average is above the configured threshold then scream */
+function validateTiming(testResult, done) {
+  var testRoutine = tests[testResult.serviceName][testResult.testId];
+  var windowWidth = 5;
 
+  database.TestResult
+  .find({'testId': testResult.testId}) 
+  .limit(windowWidth) // the size of the interval 
+  .sort('-timeStart') // get the latest entries 
+  .exec(function(err, docs) {
+    var averageTime = 0;
+    if (docs.length < windowWidth) return;
+
+    for (var i = 0; i < docs.length; i++) {
+      averageTime += docs[i].responseTime;
+    }
+    averageTime /= docs.length;
+
+    console.log(averageTime , testRoutine.config.responseTimeThreshold)
+    if (averageTime > testRoutine.config.responseTimeThreshold) {
+      flagTestResult( testResult, "Service Response Time Too Long! (Average of last " + docs.length + " exceeded threshold)");
+    } else {
+      done();// no problems *always* called on successful test case
+    }
+
+  })
+}
 
 function evaluateTest(testResult) {
-  var windowWidth = 5;
   var testRoutine = tests[testResult.serviceName][testResult.testId];
 
   try {
     testRoutine.criteria(testResult,function() { 
-      database.TestResult
-      .find({'testId': testResult.testId}) 
-      .limit(windowWidth) // the size of the interval 
-      .sort('-timeStart') // get the latest entries 
-      .exec(function(err, docs) {
-        var averageTime = 0;// Average method
-        if (docs.length < windowWidth) return;
-
-        // iterate over rest of documents and find average
-        // also count the number of individual documents aver the threshold
-        for (var i = 0; i < docs.length; i++) {
-          // aggregate time to find average later
-          averageTime += docs[i].responseTime;
-        }
-
-        // determine average
-        averageTime /= docs.length;
-
-        if (averageTime > testRoutine.config.responseTimeThreshold) {
-          throw "Service Response Time Too Long! (Average of last " + docs.length + " exceeded threshold)"
-        } else {
+      validateTiming(testResult, function() {
+        if (unhealthyTests[testResult.testId] !== undefined) {
           resolveEvent(testResult);
         }
-
       })
     });
   } catch (e) {
-    flagTestResult( testResult, e );      
+    flagTestResult( testResult, e ); // logic error 
   }
-
-
 }
 
 var startScreenr = function(queue) {
