@@ -17,7 +17,8 @@ module.exports.sandbox = {
 			(testResult.error == null).should.be.true;
 
 			// sample balance: 28041.6
-			testResult.response.should.be.a.Number
+			response = testResult.response.body;
+			response.should.be.a.Number
         .and.above(0);
 
       done(true);
