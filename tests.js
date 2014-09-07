@@ -1,46 +1,7 @@
-test({
-	responseTimeThreshold: 5000
-},
-	function(done) {
-	// code to run
-
-}, function(err, response, done) {
-	// check response
-
-	response.code.should.be.200;
-
-	var threshold = 100;  // consecutive failures
-
-	response.failuresSoFar > threshold;
-});
-
-test(function(done) {
-	// code to run
-
-}, function(err, response, done) {
-	// check response
-});
-
-
-test(function(done) {
-	// code to run
-
-}, function(err, response, done) {
-	// check response
-});
-
-
-test(function(done) {
-	// code to run
-
-}, function(err, response, done) {
-	// check response
-});
-
 module.exports.sandbox = {
-	'id': {
+	'get balance': {
 		config: {
-
+			responseTimeThreshold: 5000
 		},
 		code: function(done) {
 
@@ -63,18 +24,4 @@ module.exports.production = {
 
 		}
 	}
-};
-
-function TestResult {
-	this.timeStart = null;
-	this.timeEnd = null;
-	this.responseTime = 
-
-	this.response = {
-		code: null,
-		body: null,
-		headers: null
-	};
-
-	this.testId = '';
 };
