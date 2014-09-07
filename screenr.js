@@ -26,12 +26,12 @@ function flagTestResult(testResult, errorMessage) {
 function evaluateTest(testResult) {
     
     var testRoutine = tests[testResult.serviceName][testResult.id];
-    
-    testRoutine.criteria(testResult, function( successStatus, failureMessage ) {
-    	if (successStatus === false) {
-            flagTestResult( testResult, failureMessage )
-    	} 
-    })
+    try {
+        testRoutine.criteria(testResult,function() {});
+
+    } catche (e) {
+        flagTestResult( testResult, e );        
+    }
 
 }
 
