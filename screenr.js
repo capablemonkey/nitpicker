@@ -32,7 +32,7 @@ function createEvent(testResult, done) {
   var testEvent = new database.Event({
     description: testResult.anomaly,
     testId: testResult.testId,
-    serviceName: TestResult.serviceName,
+    serviceName: testResult.serviceName,
     updates: [],
     resolved: false,
     createdDate: new Date()
