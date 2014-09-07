@@ -4,18 +4,20 @@ var screenr = require('./screenr.js');
 var frontend = require('./frontend/app.js');
 var EventEmitter = require('events').EventEmitter;
 
+//TODO decouple the screenr from the worker, maybe package the
+// screenr with the notifier
 queue = new EventEmitter();
 queue.array = [];
 console.log(queue);
 
 queue.push = function(element) {
-	this.array.push(element)
-	this.emit('push');
+    this.array.push(element)
+    this.emit('push');
 }
 queue.pop = function() {
-	var popped_element = this.array.pop();
-	this.emit('pop');
-	return popped_element;
+    var popped_element = this.array.pop();
+    this.emit('pop');
+    return popped_element;
 }
 
 worker.startWorker(queue);
