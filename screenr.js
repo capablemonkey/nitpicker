@@ -10,56 +10,59 @@ function generateNotification(anomaly) {
 
 
 function flagTestResult(testResult, errorMessage) {
-    
-  database.TestResult.findById(testResult.id, function(err, doc) {
-    if (err !== null) {
-      throw err;
-    } 
-    else if (doc !== null) {
-      doc.anomaly = errorMessage;
-      doc.save(function(err) {
-          throw err;
+    console.log('test result flagged!!',errorMessage)
+      testResult.anomaly = errorMessage;
+      testResult.save(function(err) { 
+        if (err !== null) {
+          throw err; 
+        }
       });
-    } else  {
-        throw 'somehow there was not an error, and not a doc from the db';
-    }
-  })
 }
 
 var healthiness = {};
-var healthinessThreshold = 3;
-var periodLength = 5;
-var periodCounter = 0;
+var healthinessThreshhold = 0.75;// TODO think about the counting method
+var windowWidth = 5;
 function evaluateTest(testResult) {
     
-  var testRoutine = tests[testResult.serviceName][testResult.id];
+  var testRoutine = tests[testResult.serviceName][testResult.testId];
+
+  console.log('begin evaluation')
+
   try {
-      testRoutine.criteria(testResult,function() {
+      testRoutine.criteria(testResult,function() { 
+        database.TestResult
+          .find({'testId': testResult.testId})
+          .limit(windowWidth) /* the size of the interval */
+          .sort('-timeStart')
+          .exec(function(err, docs) {
 
-        if (healthiness[testResult.testId] === undefined) {
-          healthiness[testResult.testId] = {
-              periodCounter : 0,
-              score : 0
-          };
-        }
-        
-        var curTestHealthiness = healthiness[testResult.testId];
-        curTestHealthiness.periodCounter++;
-        
-        if ( testResult.responseTime > testRoutine.config.responseTimeThreshold) {
-            curTestHealthiness.score++; // fails one health check
-        }
-        if (curTestHealthiness.score > healthinessThreshold) {
-            // create an event AND flag an anomaly
-            
-            flagTestResult( testResult, "Service Response Time Too Long!" );
-            console.log("Service Response Time Too Long!")
-        }
+            var numTooSlow = 0;// Counting method
+            var averageTime = 0;// Average method
+            if (docs.length < windowWidth) return;
 
-        if (curTestHealthiness.periodCounter > periodLength) {// interval has ended, reset
-            curTestHealthiness.periodCounter = 0;
-            curTestHealthiness.score = 0;
-        }
+            // iterate over rest of documents and find average
+            // also count the number of individual documents aver the threshold
+            for (var i = 0; i < docs.length; i++) {
+              if (docs[i].responseTime > testRoutine.config.responseTimeThreshold) {
+                numTooSlow++;
+              }
+              // aggregate time to find average later
+              averageTime += docs[i].responseTime;
+            }
+
+            // determine average
+            averageTime /= docs.length;
+
+            console.log('average time',averageTime)
+            if (averageTime > testRoutine.config.responseTimeThreshold) {
+              flagTestResult( testResult, "Service Response Time Too Long! (Average of last "+docs.length+" exceeded threshold)" );
+            } 
+            if (numTooSlow > Math.ceil( ( 1 - healthinessThreshhold ) * docs.length ) ) {
+              // if healthiness threshold is .75 then 0.25 of the elements are 
+              // invalid
+              flagTestResult( testResult, "Service Response Time Too Long! (Count of failures in last "+docs.length+" over "+healthinessThreshhold*100+"%)" )
+            }
+          })
       });
   } catch (e) {
       flagTestResult( testResult, e );        
