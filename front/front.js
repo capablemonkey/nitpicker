@@ -2,18 +2,21 @@ if (Meteor.isClient) {
   // counter starts at 0
   Session.setDefault("counter", 0);
 
+  Meteor.subscribe('testResultz', 5);
+  Meteor.subscribe('events', 5);
+
   TestResult = new Meteor.Collection("testresults");
   NitpickerEvent = new Meteor.Collection("events");
 
   Template.testResults.helpers({
-    testResults: function() {
-      return TestResult.find({}, {limit: 5, sort: {timeStart: -1}});
+    results: function() {
+      return TestResult.find({}, {limit: 5});
     }
   });
 
   Template.nitpickerEvents.helpers({
     getEvents: function() {
-      return NitpickerEvent.find({}, {sort: {createdDate: -1}, limit: 5});
+      return NitpickerEvent.find({}, {limit: 5});
     }
   });
 
@@ -38,6 +41,13 @@ if (Meteor.isServer) {
     TestResult = new Meteor.Collection("testresults");
   });
 
+  Meteor.publish('testResultz', function(limit) {
+    return TestResult.find({}, { limit: limit, sort: {timeStart: -1}});
+  });
+
+  Meteor.publish('events', function(limit) {
+    return NitpickerEvent.find({}, { limit: limit, sort: {createdDate: -1}});
+  });
 }
 
 // MONGO_URL=mongodb://localhost/my_database meteor --port 8888

@@ -6,20 +6,21 @@
   <h1>Welcome to Meteor!</h1>
 
   {{> hello}}
+  {{> testResults}}
   {{> nitpickerEvents}}
 </body>
 
 <template name="testResults">
 	BLAH
-  {{#each testResults}}
-    <div>Test {{testId}} took some ms to complete.</div>
+  {{#each results}}
+    <div>Test "{{testId}}" took {{responseTime}} ms to complete.</div>
   {{/each}}
 </template>
 
 <template name="nitpickerEvents">
 	Events
   {{#each getEvents}}
-    <div>{{serviceName}}: issue with "{{testId}}": {{description}} | {{createdDate}}</div>
+    <div>{{serviceName}}: issue with "{{testId}}": {{description}} | {{createdDate}} | {{resolved}}</div>
   {{/each}}
 </template>
 
