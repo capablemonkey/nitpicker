@@ -1,0 +1,29 @@
+<head>
+  <title>front</title>
+</head>
+
+<body>
+  <h1>Welcome to Meteor!</h1>
+
+  {{> hello}}
+  {{> nitpickerEvents}}
+</body>
+
+<template name="testResults">
+	BLAH
+  {{#each testResults}}
+    <div>Test {{testId}} took some ms to complete.</div>
+  {{/each}}
+</template>
+
+<template name="nitpickerEvents">
+	Events
+  {{#each getEvents}}
+    <div>{{serviceName}}: issue with "{{testId}}": {{description}} | {{createdDate}}</div>
+  {{/each}}
+</template>
+
+<template name="hello">
+  <button>Click Me</button>
+  <p>You've pressed the button {{counter}} times.</p>
+</template>
