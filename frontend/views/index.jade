@@ -1,33 +1,54 @@
 extends layout
 
 block content
-  h1 nitpicker
-  p Welcome to nitpicker
+  div.row
+    div.small-10.large-10.large-centered.columns
 
-  .statusDashboard
-    #prodStatus.statusBox
-      .statusHeading 
-        a Production
-        span= prodMessage
-        img(src=(prodOk ? "/images/status/green.png" : "/images/status/red.png"))
+      div.row
+        .statusDashboard
+          #prodStatus.statusBox
+            .statusHeading 
+              a Production
+              span= prodMessage
+              img(src=(prodOk ? "/images/status/green.png" : "/images/status/red.png"))
 
-    #sandboxStatus.statusBox
-      .statusHeading 
-        a Sandbox
-        span= sandboxMessage
-        img(src=(sandboxOk ? "/images/status/green.png" : "/images/status/red.png"))
+          #sandboxStatus.statusBox
+            .statusHeading 
+              a Sandbox
+              span= sandboxMessage
+              img(src=(sandboxOk ? "/images/status/green.png" : "/images/status/red.png"))
 
-  #timeline
-    each event in events
-      ul
-        li Event: 
-          = event.description
+      hr
 
-  #log
-    each result in results
-      ul
-        li Test Result: 
-          = result.testId 
-          |  | Response time: 
-          = result.responseTime
-          |  ms
+      div.row#log
+        div.small-5.large-5.columns
+          h2 Test Results
+          each result in results
+            div.panel.notice Test "
+                = result.testId 
+                | " completed.  Response time: 
+                = result.responseTime
+                |  ms
+        div.small-5.large-5.columns
+          h2 Stats
+          p Time since last trouble: 3 hours
+          p Fully functional % time: 97%
+          p Total downtime: 4 hours
+          p Current service-wide average response time: 800 ms
+          p Average trouble event duration: 5 hours
+
+      hr
+
+      div.row
+        h2 Events
+        dl.accordion(data-accordion)
+          each event in events
+            dd.accordion-navigation
+              a(href="#event" + event._id)
+                = "["+ event.serviceName + "] " + event.testId + " issue"
+              div(id="event" + event._id).content
+                p Test: 
+                  = event.testId
+                p= event.resolved ? 'Resolved' : 'Ongoing issue'
+                p= event.createdDate
+                p= event.description

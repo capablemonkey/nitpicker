@@ -11,7 +11,7 @@ router.get('/', function(req, res) {
 	db.TestResult
 		.find()
 		.sort('-timeStart')
-		.limit(10)
+		.limit(5)
 		.exec()
 
 	.then(function(results){
@@ -38,8 +38,6 @@ router.get('/', function(req, res) {
 	  	results: testResults
 	  });
 	});
-
-  
 });
 
 module.exports = router;
