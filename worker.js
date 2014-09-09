@@ -35,38 +35,49 @@ function runTestsInSeries(service, serviceName, screenrQueue) {
 // in a new TestResult
 
 function runTest(test, name, serviceName, screenrQueue, callback) {
-  var beginTime = Date.now();
-  console.log(beginTime, 'running test:', name);
+  // first, run test.before(), and pass results (before) to test.execute()
+  
+  if (test.before) {
+    test.before(function(results) {execute(results);});
+  }
+  else {
+    execute(null);
+  }
 
-  test.execute(function(err, response) {
-    var endTime = Date.now();
-    var responseTime = (endTime - beginTime); // time delta in ms
+  function execute(before) {
+    var beginTime = Date.now();
+    console.log(beginTime, 'running test:', name);
 
-    // save err, response in new TestResult object.
+    test.execute(function(err, response) {
+      var endTime = Date.now();
+      var responseTime = (endTime - beginTime); // time delta in ms
 
-    var testResult = new db.TestResult({
-      testId: name,
-      serviceName: serviceName, //production or sandbox
-      error: err,
-      timeStart: Date(beginTime),
-      timeEnd: Date(endTime),
-      responseTime: responseTime,
-      response: {
-        code: null,
-        body: response,
-        headers: null
-      }
-    });
+      // save err, response in new TestResult object.
 
-    testResult.save();
+      var testResult = new db.TestResult({
+        testId: name,
+        serviceName: serviceName, //production or sandbox
+        error: err,
+        timeStart: Date(beginTime),
+        timeEnd: Date(endTime),
+        responseTime: responseTime,
+        response: {
+          code: null,
+          body: response,
+          headers: null
+        }
+      });
 
-    console.log(testResult);
+      testResult.save();
 
-    // notify screenr of this new TestResult
-    screenrQueue.push(testResult);
+      console.log(testResult);
 
-    callback();
-  });
+      // notify screenr of this new TestResult
+      screenrQueue.push(testResult);
+
+      callback();
+    }, before);
+  }
 }
 
 module.exports = {

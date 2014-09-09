@@ -11,7 +11,11 @@ module.exports.sandbox = {
 		config: {
 			responseTimeThreshold: 5000
 		},
-		execute: function(done) {
+		before: function(done) {
+			done(5);
+		},
+		execute: function(done, before) {
+			console.log(before);
 			dwolla.setToken(config.accessToken);
       dwolla.balance(done);
 		},
