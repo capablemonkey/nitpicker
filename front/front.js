@@ -2,7 +2,7 @@ if (Meteor.isClient) {
   // counter starts at 0
   Session.setDefault("counter", 0);
 
-  Meteor.subscribe('testResultz', 5);
+  Meteor.subscribe('testResultz', 10);
   Meteor.subscribe('events', 5);
 
   TestResult = new Meteor.Collection("testresults");
@@ -10,7 +10,7 @@ if (Meteor.isClient) {
 
   Template.testResults.helpers({
     results: function() {
-      return TestResult.find({}, {limit: 5});
+      return TestResult.find({}, {limit: 10});
     }
   });
 
@@ -48,6 +48,9 @@ if (Meteor.isServer) {
   Meteor.publish('events', function(limit) {
     return NitpickerEvent.find({}, { limit: limit, sort: {createdDate: -1}});
   });
+
+  // TODO: get list of tests
+  // TODO: for each test, get average response times, testResults for the past hour
 }
 
 // MONGO_URL=mongodb://localhost/my_database meteor --port 8888
