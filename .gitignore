@@ -1,2 +1,6 @@
 node_modules/
-front/.meteor
+/front/.meteor/
+/front/.meteor/versions
+/front/.meteor/release
+/front/.meteor/packages
+/front/.meteor/.finished-upgraders
