@@ -1,7 +1,6 @@
 var config = require('./config.js');
 var worker = require('./worker.js');
 var screenr = require('./screenr.js');
-var frontend = require('./frontend/app.js');
 var EventEmitter = require('events').EventEmitter;
 
 //TODO decouple the screenr from the worker, maybe package the
@@ -23,6 +22,4 @@ queue.pop = function() {
 worker.startWorker(queue);
 screenr.startScreenr(queue);
 
-// start front end (express)
-frontend.set('port', config.port);
-frontend.listen(frontend.get('port'));
+console.log('*** Started worker and screenr.');
