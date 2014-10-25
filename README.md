@@ -2,7 +2,13 @@
 
 # Getting started
 
-`node app.js`
+Make sure that MongoDB daemon is running locally:
+
+`mongod`
+
+Then run:
+
+`./start.sh`
 
 ### TestResult
 
