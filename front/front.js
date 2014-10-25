@@ -2,7 +2,7 @@ if (Meteor.isClient) {
   // counter starts at 0
   Session.setDefault("counter", 0);
 
-  Meteor.subscribe('testResultz', 10);
+  Meteor.subscribe('testResultz', 100);
   Meteor.subscribe('events', 5);
 
   TestResult = new Meteor.Collection("testresults");
@@ -31,9 +31,13 @@ if (Meteor.isClient) {
       } ]
     } );
 
-    var axes = new Rickshaw.Graph.Axis.Time({ graph: graph });
+    var time = new Rickshaw.Fixtures.Time();
+    var xAxis = new Rickshaw.Graph.Axis.Time({ 
+      graph: graph,
+      timeUnit: time.unit('hour')
+    });
     var hoverDetail = new Rickshaw.Graph.HoverDetail({ graph: graph });
-    var y_axis = new Rickshaw.Graph.Axis.Y({
+    var yAxis = new Rickshaw.Graph.Axis.Y({
         graph: graph,
         orientation: 'left',
         tickFormat: function(y) {
@@ -46,11 +50,11 @@ if (Meteor.isClient) {
     graph.render();
 
     Tracker.autorun(function() {
-      results = TestResult.find({}, {limit: 10});
+      results = TestResult.find({}, {limit: 100});
       data = [];
       results.forEach(function(result) {
         data.push({
-          x: result.timeStart.getTime(),
+          x: result.timeStart.getTime() / 1000,
           y: result.responseTime
         });
       });
