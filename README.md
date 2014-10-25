@@ -6,7 +6,21 @@ nitpicker detects anomalies in the form of failed tests or unusually high respon
 
 Uses node.js for test running / monitoring, mongodb to store test results and Meteor to expose that data in real time.
 
-# Getting started
+## Setup
+
+Install Meteor if you don't already have it:
+
+`curl https://install.meteor.com | /bin/sh`
+
+From the repo directory, install npm dependencies:
+
+`sudo npm i`
+
+From the `tests` directory, install required npm dependencies:
+
+`sudo npm i`
+
+## Getting started
 
 Make sure that MongoDB daemon is running locally:
 
