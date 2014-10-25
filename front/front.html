@@ -11,10 +11,10 @@
 
   {{> hello}}
   {{> testResults }}
-  
-  {{> Template.dynamic template="endpointView" data='Basic Account Info' }}
-  {{> Template.dynamic template="endpointView" data='Full Account Info' }}
-  {{> Template.dynamic template="endpointView" data='Balance' }}
+
+  {{> endpointView endpointName='Basic Account Info' }}
+  {{> endpointView endpointName='Full Account Info' }}
+  {{> endpointView endpointName='Balance' }}
 
   {{> nitpickerEvents}}
 </body>

@@ -19,18 +19,18 @@ if (Meteor.isClient) {
 
   Template.endpointView.helpers({
     endpointName: function() {
-      return Template.instance().data;
+      return Template.instance().data.endpointName;
     },
     DOMName: function() {
       // 'Basic Account Info' -> 'basic-account-info'
-      return Template.instance().data.toLowerCase().split(' ').join('-');
+      return Template.instance().data.endpointName.toLowerCase().split(' ').join('-');
     }
   });
 
   Template.endpointView.rendered = function() {
     data = [{x: 0, y: 0}, {x: 1, y: 1}];
 
-    var endpointName = this.data;
+    var endpointName = this.data.endpointName;
     var DOMName = endpointName.toLowerCase().split(' ').join('-');
 
     var graph = new Rickshaw.Graph( {
