@@ -7,10 +7,15 @@
 </head>
 
 <body>
-  <h1>Welcome to Meteor!</h1>
+  <h1>nitpicker!</h1>
 
   {{> hello}}
-  {{> testResults}}
+  {{> testResults }}
+  
+  {{> Template.dynamic template="endpointView" data='Basic Account Info' }}
+  {{> Template.dynamic template="endpointView" data='Full Account Info' }}
+  {{> Template.dynamic template="endpointView" data='Balance' }}
+
   {{> nitpickerEvents}}
 </body>
 
@@ -21,10 +26,16 @@
     <div>Test "{{testId}}" took {{responseTime}} ms to complete.</div>
   {{/each}}
 
-<div id="graph_container">
-        <div id="y_axis"></div>
-        <div id="graph"></div>
-</div>
+</template>
+
+<template name="endpointView">
+
+<h3>{{endpointName}}</h3>
+
+  <div class="graph_container">
+          <div class="y-axis" id="y-{{ DOMName }}"></div>
+          <div class="graph" id="graph-{{ DOMName }}"></div>
+  </div>
 
 </template>
 

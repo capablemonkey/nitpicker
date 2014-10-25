@@ -1,3 +1,6 @@
+var GRAPH_Y_AXIS_MAX_RESPONSE_TIME = 1500;
+var GRAPH_Y_AXIS_MIN_RESPONSE_TIME = 0;
+
 if (Meteor.isClient) {
   // counter starts at 0
   Session.setDefault("counter", 0);
@@ -14,15 +17,28 @@ if (Meteor.isClient) {
     }
   });
 
-  Template.testResults.rendered = function() {
+  Template.endpointView.helpers({
+    endpointName: function() {
+      return Template.instance().data;
+    },
+    DOMName: function() {
+      // 'Basic Account Info' -> 'basic-account-info'
+      return Template.instance().data.toLowerCase().split(' ').join('-');
+    }
+  });
+
+  Template.endpointView.rendered = function() {
     data = [{x: 0, y: 0}, {x: 1, y: 1}];
-    
+
+    var endpointName = this.data;
+    var DOMName = endpointName.toLowerCase().split(' ').join('-');
+
     var graph = new Rickshaw.Graph( {
-      element: document.querySelector("#graph"),
+      element: document.querySelector("#graph-" + DOMName),
       width: 580,
       height: 250,
-      max: 1000,
-      min: 0,
+      max: GRAPH_Y_AXIS_MAX_RESPONSE_TIME,
+      min: GRAPH_Y_AXIS_MIN_RESPONSE_TIME,
       renderer: 'line',
       series: [ {
         color: 'steelblue',
@@ -44,13 +60,13 @@ if (Meteor.isClient) {
           if (y < 1000) { return y + ' ms'}
           if (y >= 1000) { return (y / 1000) + 's'}
         },
-        element: document.getElementById('y_axis'),
+        element: document.getElementById('y-' + DOMName),
     });
 
     graph.render();
 
-    Tracker.autorun(function() {
-      results = TestResult.find({}, {limit: 100});
+    this.autorun(function() {
+      results = TestResult.find({testId: endpointName}, {limit: 100});
       data = [];
       results.forEach(function(result) {
         data.push({
@@ -68,7 +84,7 @@ if (Meteor.isClient) {
     });
   };
 
-  Template.testResults.created = function() {
+  Template.endpointView.created = function() {
   };
 
   Template.nitpickerEvents.helpers({
@@ -99,7 +115,7 @@ if (Meteor.isServer) {
   });
 
   Meteor.publish('testResultz', function(limit) {
-    return TestResult.find({testId: 'Basic Account Info'}, { limit: limit, sort: {timeStart: -1}});
+    return TestResult.find({}, { limit: limit, sort: {timeStart: -1}});
   });
 
   Meteor.publish('events', function(limit) {
