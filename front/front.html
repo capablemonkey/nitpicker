@@ -12,15 +12,13 @@
   {{> hello}}
   {{> testResults }}
 
-  {{> endpointView endpointName='Basic Account Info' }}
-  {{> endpointView endpointName='Full Account Info' }}
-  {{> endpointView endpointName='Balance' }}
+  {{> endpointsStats}}
 
   {{> nitpickerEvents}}
 </body>
 
 <template name="testResults">
-	BLAH
+	<h3>Tests Results (real-time)</h3>
 
   {{#each results}}
     <div>Test "{{testId}}" took {{responseTime}} ms to complete.</div>
@@ -28,9 +26,17 @@
 
 </template>
 
+<template name="endpointsStats">
+{{#each endpoints}}
+  {{> endpointView endpointName=name }}
+{{/each}}
+</template>
+
 <template name="endpointView">
 
 <h3>{{endpointName}}</h3>
+
+<p>Average Response Time: <span id="averageResponseTimeValue">{{ averageResponseTime }}</span></p>
 
   <div class="graph_container">
           <div class="y-axis" id="y-{{ DOMName }}"></div>
@@ -40,13 +46,16 @@
 </template>
 
 <template name="nitpickerEvents">
-	Events
+	<h3>Events</h3>
   {{#each getEvents}}
     <div>{{serviceName}}: issue with "{{testId}}": {{description}} | {{createdDate}} | {{resolved}}</div>
   {{/each}}
 </template>
 
 <template name="hello">
-  <button>Click Me</button>
-  <p>You've pressed the button {{counter}} times.</p>
+  <button name="24-hours">Past 24 hours</button>
+  <button name="7-days">Past week</button>
+  <button name="1-month">Past month</button>
+
+  <p>Showing {{timeWindow}}.</p>
 </template>

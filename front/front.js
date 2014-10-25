@@ -1,9 +1,14 @@
 var GRAPH_Y_AXIS_MAX_RESPONSE_TIME = 1500;
 var GRAPH_Y_AXIS_MIN_RESPONSE_TIME = 0;
+var TIME_WINDOW = {
+  '24-hours': 1000 * 60 * 60 * 24,
+  '7-days': 1000 * 60 * 60 * 24 * 7,
+  '1-month': 1000 * 60 * 60 * 24 * 7
+};
+var SESSION_PREFIX_AVERAGE_RESPONSE_TIME = "avgResponseTime_";
 
 if (Meteor.isClient) {
-  // counter starts at 0
-  Session.setDefault("counter", 0);
+  Session.setDefault("timeWindow", '24-hours');
 
   Meteor.subscribe('testResultz', 100);
   Meteor.subscribe('events', 5);
@@ -17,6 +22,16 @@ if (Meteor.isClient) {
     }
   });
 
+  Template.endpointsStats.helpers({
+    endpoints: function() {
+      return [
+        {name: 'Basic Account Info'}, 
+        {name: 'Balance'},
+        {name: 'Full Account Info'}
+      ];
+    }
+  });
+
   Template.endpointView.helpers({
     endpointName: function() {
       return Template.instance().data.endpointName;
@@ -24,6 +39,10 @@ if (Meteor.isClient) {
     DOMName: function() {
       // 'Basic Account Info' -> 'basic-account-info'
       return Template.instance().data.endpointName.toLowerCase().split(' ').join('-');
+    },
+    averageResponseTime: function() {
+      var endpointName = Template.instance().data.endpointName;
+      return Session.get(SESSION_PREFIX_AVERAGE_RESPONSE_TIME + endpointName) || "Loading";
     }
   });
 
@@ -32,6 +51,7 @@ if (Meteor.isClient) {
 
     var endpointName = this.data.endpointName;
     var DOMName = endpointName.toLowerCase().split(' ').join('-');
+    var template = this;
 
     var graph = new Rickshaw.Graph( {
       element: document.querySelector("#graph-" + DOMName),
@@ -56,16 +76,14 @@ if (Meteor.isClient) {
     var yAxis = new Rickshaw.Graph.Axis.Y({
         graph: graph,
         orientation: 'left',
-        tickFormat: function(y) {
-          if (y < 1000) { return y + ' ms'}
-          if (y >= 1000) { return (y / 1000) + 's'}
-        },
+        tickFormat: formatResponseTime,
         element: document.getElementById('y-' + DOMName),
     });
 
     graph.render();
 
     this.autorun(function() {
+      // update graph: 
       results = TestResult.find({testId: endpointName}, {limit: 100});
       data = [];
       results.forEach(function(result) {
@@ -81,6 +99,14 @@ if (Meteor.isClient) {
 
       graph.series[0].data = data;
       graph.render();
+
+      var timeWindowInMS = TIME_WINDOW[Session.get("timeWindow")];
+
+      // update avg response time:
+      Meteor.call('getAverageResponseTime', endpointName, timeWindowInMS, function(err, result) {
+        console.log('rt', endpointName, result);
+        Session.set(SESSION_PREFIX_AVERAGE_RESPONSE_TIME + endpointName, formatResponseTime(result));
+      });
     });
   };
 
@@ -94,15 +120,15 @@ if (Meteor.isClient) {
   });
 
   Template.hello.helpers({
-    counter: function () {
-      return Session.get("counter");
+    timeWindow: function () {
+      return Session.get("timeWindow");
     }
   });
 
   Template.hello.events({
-    'click button': function () {
-      // increment the counter when button is clicked
-      Session.set("counter", Session.get("counter") + 1);
+    'click button': function (event) {
+      // set time window
+      Session.set("timeWindow", event.target.name);
     }
   });
 }
@@ -114,6 +140,9 @@ if (Meteor.isServer) {
     TestResult = new Meteor.Collection("testresults");
   });
 
+  // TODO: implement server side methods to calculate average response time over 24 hours, 7 days, 1 month
+  // use Meteor.call() on client side
+
   Meteor.publish('testResultz', function(limit) {
     return TestResult.find({}, { limit: limit, sort: {timeStart: -1}});
   });
@@ -122,8 +151,33 @@ if (Meteor.isServer) {
     return NitpickerEvent.find({}, { limit: limit, sort: {createdDate: -1}});
   });
 
+  Meteor.methods({
+    getAverageResponseTime: function(endpointName, timeWindow) {
+      // TODO: consider using mapreduce here...
+
+      var timeThreshold = new Date(new Date() - timeWindow);
+      var results = TestResult.find({testId: endpointName, timeStart: {$gte: timeThreshold}}, {});
+      var responseTimes = results.map(function(result, index) {
+        return result.responseTime;
+      });
+
+      var averageResponseTime = responseTimes.reduce(function(prev, current) {
+        return prev + current;
+      }, 0) / responseTimes.length;
+
+      return averageResponseTime;
+    }
+  });
+
   // TODO: get list of tests
   // TODO: for each test, get average response times, testResults for the past hour
 }
 
 // MONGO_URL=mongodb://localhost/my_database meteor --port 8888
+
+// Helper functions:
+
+var formatResponseTime = function(y) {
+  if (y < 1000) { return Math.floor(y) + ' ms'; }
+  if (y >= 1000) { return (y / 1000) + 's'; }
+};
