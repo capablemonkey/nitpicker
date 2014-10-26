@@ -1,5 +1,5 @@
 <head>
-  <title>front</title>
+  <title>nitpicker</title>
   <script src="//cdnjs.cloudflare.com/ajax/libs/rickshaw/1.4.6/rickshaw.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
@@ -62,7 +62,12 @@
   <h3>{{endpointName}}</h3>
 
   <div class="col-md-3">
-    <p>Average Response Time: <span id="averageResponseTimeValue">{{ averageResponseTime }}</span></p>
+    <div class="well">
+      <span class="averageResponseTimeValue">{{ averageResponseTime }}</span>
+      <p>Average Response Time</p>
+    </div>
+    
+    
     <a>Events:</a>
 
     <ul>

@@ -96,7 +96,7 @@ if (Meteor.isClient) {
     var time = new Rickshaw.Fixtures.Time();
     var xAxis = new Rickshaw.Graph.Axis.Time({ 
       graph: graph,
-      timeUnit: time.unit('hour')
+      timeUnit: time.unit('minute')
     });
     var hoverDetail = new Rickshaw.Graph.HoverDetail({ graph: graph });
     var yAxis = new Rickshaw.Graph.Axis.Y({
