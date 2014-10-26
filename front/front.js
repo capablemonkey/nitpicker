@@ -46,6 +46,13 @@ if (Meteor.isClient) {
     }
   });
 
+  Tracker.autorun(function() {
+    var latestTestResult = TestResult.findOne({}, { limit: 1, sort: {timeStart: -1}});
+    if (typeof latestTestResult !== 'undefined') {
+      Session.set('lastUpdated', latestTestResult.timeStart);
+    }
+  });
+
   Template.endpointView.rendered = function() {
     data = [{x: 0, y: 0}, {x: 1, y: 1}];
 
@@ -122,6 +129,15 @@ if (Meteor.isClient) {
   Template.hello.helpers({
     timeWindow: function () {
       return Session.get("timeWindow");
+    },
+    lastUpdated: function(ISO) {
+      var lastUpdated = Session.get("lastUpdated");
+      if (typeof lastUpdated === 'undefined') { return 'Loading...'; }
+      if (ISO) { 
+        $("time.timeago").data("timeago", { datetime: new Date() });
+        return lastUpdated.toISOString(); 
+      }
+      return lastUpdated || 'Loading... ';
     }
   });
 
@@ -131,6 +147,13 @@ if (Meteor.isClient) {
       Session.set("timeWindow", event.target.name);
     }
   });
+
+  Template.hello.rendered = function() {
+    jQuery.timeago.settings.strings.seconds = '%d seconds';
+    jQuery.timeago.settings.refreshMillis = 1000;
+    $("time.timeago").timeago();
+  };
+
 }
 
 if (Meteor.isServer) {

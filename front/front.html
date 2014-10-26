@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
@@ -25,6 +27,16 @@
   </div>
   
 </body>
+
+<template name="hello">
+  <button name="24-hours">Past 24 hours</button>
+  <button name="7-days">Past week</button>
+  <button name="1-month">Past month</button>
+
+  <p>Showing {{timeWindow}}.</p>
+
+  <p>Last updated: <time class="timeago" datetime="{{lastUpdated ISO=true}}"></time>.</p>
+</template>
 
 <template name="testResults">
 <div class="row">
@@ -65,12 +77,4 @@
   {{#each getEvents}}
     <div>{{serviceName}}: issue with "{{testId}}": {{description}} | {{createdDate}} | {{resolved}}</div>
   {{/each}}
-</template>
-
-<template name="hello">
-  <button name="24-hours">Past 24 hours</button>
-  <button name="7-days">Past week</button>
-  <button name="1-month">Past month</button>
-
-  <p>Showing {{timeWindow}}.</p>
 </template>
