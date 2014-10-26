@@ -22,7 +22,7 @@ function flagTestResult(testResult, errorMessage) {
 
     // create event if none is already created
     if (unhealthyTests[testResult.environmentName][testResult.endpointName] === undefined) {
-      console.log('> Event created!', errorMessage);
+      // console.log('> Event created!', errorMessage);
       createEvent(testResult, function(doc) {
         unhealthyTests[testResult.environmentName][testResult.endpointName] = doc;
       });
@@ -58,7 +58,7 @@ function createEvent(testResult, done) {
  and finds if any Events exist for this type of test
  if so, then resolve the EVent */
 function resolveEvent(testResult) {
-  console.log('> Event resolved!');
+  // console.log('> Event resolved!');
   testEvent = unhealthyTests[testResult.environmentName][testResult.endpointName];
   /* there is a peculiarity available here... the Event
    object has an array of updates inside of it. The object stored
@@ -98,7 +98,7 @@ function validateTiming(testResult, done) {
     }
     averageTime /= docs.length;
 
-    console.log(testResult.endpointName, 'avg res. time: ', averageTime , 'threshold: ', testRoutine.config.responseTimeThreshold, 'closeness: ', averageTime / testRoutine.config.responseTimeThreshold);
+    // console.log(testResult.endpointName, 'avg res. time: ', averageTime , 'threshold: ', testRoutine.config.responseTimeThreshold, 'closeness: ', averageTime / testRoutine.config.responseTimeThreshold);
     if (averageTime > testRoutine.config.responseTimeThreshold) {
       flagTestResult( testResult, "API response time too high. (Average of last " + docs.length + " response times: " + averageTime + " ms exceeded threshold)");
     } else {
