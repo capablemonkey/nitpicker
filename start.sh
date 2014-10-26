@@ -1,3 +1,3 @@
 #!/bin/bash
 
-node app.js & (cd front && MONGO_URL=mongodb://localhost/my_database meteor)
+node app.js & (cd front && MONGO_URL=mongodb://localhost/nitpicker meteor)
