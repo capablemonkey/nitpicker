@@ -135,6 +135,8 @@ if (Meteor.isClient) {
       if (typeof lastUpdated === 'undefined') { return 'Loading...'; }
       if (ISO) { 
         $("time.timeago").data("timeago", { datetime: new Date() });
+        $('time.timeago').css({backgroundColor: '#32CD32'});
+        $('time.timeago').animate({backgroundColor: "#FFFFFF"}, 1500);
         return lastUpdated.toISOString(); 
       }
       return lastUpdated || 'Loading... ';

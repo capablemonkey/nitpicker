@@ -10,6 +10,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-timeago/1.4.0/jquery.timeago.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -33,7 +34,7 @@
   <button name="7-days">Past week</button>
   <button name="1-month">Past month</button>
 
-  <p>Showing {{timeWindow}}.</p>
+  <p>Showing past {{timeWindow}}.</p>
 
   <p>Last updated: <time class="timeago" datetime="{{lastUpdated ISO=true}}"></time>.</p>
 </template>
