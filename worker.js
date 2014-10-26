@@ -25,9 +25,6 @@ function runTestsInSeries(service, serviceName, screenrQueue) {
     return function(cb) {runTest(service[testName], testName, serviceName, screenrQueue, cb);};
   });
 
-  // TODO: set a time limit on the callback.  If one test
-  // takes abnormally long, we need to throw an error and keep going.
-
   async.series(tests);
 }
 
@@ -70,7 +67,7 @@ function runTest(test, name, serviceName, screenrQueue, callback) {
 
       testResult.save();
 
-      console.log(testResult);
+      // console.log(testResult);
 
       // notify screenr of this new TestResult
       screenrQueue.push(testResult);

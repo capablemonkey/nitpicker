@@ -7,7 +7,6 @@ var EventEmitter = require('events').EventEmitter;
 // screenr with the notifier
 queue = new EventEmitter();
 queue.array = [];
-console.log(queue);
 
 queue.push = function(element) {
     this.array.push(element)
