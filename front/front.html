@@ -30,6 +30,7 @@
 </body>
 
 <template name="hello">
+  <button name="1-hour">Past 1 hour</button>
   <button name="24-hours">Past 24 hours</button>
   <button name="7-days">Past week</button>
   <button name="1-month">Past month</button>
@@ -62,6 +63,13 @@
 
   <div class="col-md-3">
     <p>Average Response Time: <span id="averageResponseTimeValue">{{ averageResponseTime }}</span></p>
+    <a>Events:</a>
+
+    <ul>
+    {{#each getEvents}}
+      <li>{{testId}}: {{description}} {{createdDate}}</li>
+    {{/each}}
+    </ul>
   </div>
   <div class="col-md-9">
     <div class="graph_container">

@@ -1,6 +1,7 @@
 var GRAPH_Y_AXIS_MAX_RESPONSE_TIME = 1500;
 var GRAPH_Y_AXIS_MIN_RESPONSE_TIME = 0;
 var TIME_WINDOW = {
+  '1-hour': 1000 * 60 * 60,
   '24-hours': 1000 * 60 * 60 * 24,
   '7-days': 1000 * 60 * 60 * 24 * 7,
   '1-month': 1000 * 60 * 60 * 24 * 7
@@ -11,7 +12,7 @@ if (Meteor.isClient) {
   Session.setDefault("timeWindow", '24-hours');
 
   Meteor.subscribe('testResultz', 100);
-  Meteor.subscribe('events', 5);
+  Meteor.subscribe('events', 100);
 
   TestResult = new Meteor.Collection("testresults");
   NitpickerEvent = new Meteor.Collection("events");
@@ -43,6 +44,21 @@ if (Meteor.isClient) {
     averageResponseTime: function() {
       var endpointName = Template.instance().data.endpointName;
       return Session.get(SESSION_PREFIX_AVERAGE_RESPONSE_TIME + endpointName) || "Loading";
+    },
+    getEvents: function() {
+      // Retrieve events for this endpoint within the past 24 hours, 7 days, etc.
+
+      var endpointName = Template.instance().data.endpointName;
+      // calculate (now - 24 hours, 7 days, etc.)
+      var timeThreshold = new Date(new Date() - TIME_WINDOW[Session.get('timeWindow')]);
+
+      return NitpickerEvent.find({
+        testId: endpointName,
+        createdDate: {$gte: timeThreshold}
+      }, {
+        limit: 5, 
+        sort: {createdDate: -1}
+      });
     }
   });
 
@@ -54,6 +70,9 @@ if (Meteor.isClient) {
   });
 
   Template.endpointView.rendered = function() {
+
+    // TODO: when timeWindow is changed, change the graph data points
+
     data = [{x: 0, y: 0}, {x: 1, y: 1}];
 
     var endpointName = this.data.endpointName;
@@ -111,7 +130,6 @@ if (Meteor.isClient) {
 
       // update avg response time:
       Meteor.call('getAverageResponseTime', endpointName, timeWindowInMS, function(err, result) {
-        console.log('rt', endpointName, result);
         Session.set(SESSION_PREFIX_AVERAGE_RESPONSE_TIME + endpointName, formatResponseTime(result));
       });
     });
@@ -204,5 +222,5 @@ if (Meteor.isServer) {
 
 var formatResponseTime = function(y) {
   if (y < 1000) { return Math.floor(y) + ' ms'; }
-  if (y >= 1000) { return (y / 1000) + 's'; }
+  if (y >= 1000) { return (y / 1000).toFixed(2) + ' s'; }
 };
