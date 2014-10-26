@@ -1,13 +1,15 @@
 var mongoose = require('mongoose');
 
-mongoose.connect ('mongodb://localhost/my_database');
+mongoose.connect ('mongodb://localhost/nitpicker');
 
 var Schema = mongoose.Schema;
 
 /* TestResults are generated for every test against the API,
    every problematic TestResult has an anomaly */
 var TestResultSchema = new Schema({
-  testId :  String, // actual type of test
+  environmentName : String,
+  endpointName :  String, 
+  testName: String,
   error : String, 
   timeStart : Date,
   timeEnd : Date,
@@ -17,7 +19,6 @@ var TestResultSchema = new Schema({
     body: Schema.Types.Mixed,
     headers: String
   },
-  serviceName : String,
   anomaly : String
 });
 
@@ -25,8 +26,9 @@ var TestResultSchema = new Schema({
  problems currently happening */
 var EventSchema = new Schema({
   description: String,
-  testId : String,
-  serviceName: String,
+  environmentName: String,
+  endpointName : String,
+  testName: String,
   updates: [],
   resolved: Boolean,
   createdDate: Date,

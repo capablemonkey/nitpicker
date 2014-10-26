@@ -43,6 +43,7 @@ if (Meteor.isClient) {
   });
 
   Template.endpointView.helpers({
+    // TODO: show latest tests and results for endpoint
     endpointName: function() {
       return Template.instance().data.endpointName;
     },
@@ -68,7 +69,7 @@ if (Meteor.isClient) {
       var timeThreshold = new Date(new Date() - TIME_WINDOW[Session.get('timeWindow')]);
 
       return NitpickerEvent.find({
-        testId: endpointName,
+        endpointName: endpointName,
         createdDate: {$gte: timeThreshold}
       }, {
         limit: 5, 
@@ -90,7 +91,7 @@ if (Meteor.isClient) {
     // Every time a new test result for this endpoint is added,
     // update the graph and response times:
     this.autorun(function() {
-      results = TestResult.find({testId: endpointName}, {limit: 100});
+      results = TestResult.find({endpointName: endpointName}, {limit: 100});
 
       data = results.map(function(result) {
         return {
@@ -197,7 +198,7 @@ if (Meteor.isServer) {
       // TODO: consider caching this calulation for windows greater than 24 hours...
 
       var timeThreshold = new Date(new Date() - timeWindow);
-      var results = TestResult.find({testId: endpointName, timeStart: {$gte: timeThreshold}}, {});
+      var results = TestResult.find({endpointName: endpointName, timeStart: {$gte: timeThreshold}}, {});
       var responseTimes = results.map(function(result, index) {
         return result.responseTime;
       });
@@ -211,7 +212,7 @@ if (Meteor.isServer) {
     getMaxResponseTime: function(endpointName, timeWindow) {
       var timeThreshold = new Date(new Date() - timeWindow);
       var result = TestResult.findOne({
-        testId: endpointName, 
+        endpointName: endpointName, 
         timeStart: {$gte: timeThreshold}
       }, {
         sort: {responseTime: -1}

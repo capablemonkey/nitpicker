@@ -4,13 +4,13 @@ var _ = require('underscore');
 var db = require('./database');
 var async = require('async');
 
-// worker runs a batch of tests (called a Service)
+// worker runs a batch of tests (categorized by environment: sandbox, production)
 // in series every config.testInterval milliseconds
 var startWorker = function(queue) {
-  _.each(tests, function(service, serviceName) {
+  _.each(tests, function(environment, environmentName) {
 
     setInterval(function() {
-      runTestsInSeries(service, serviceName, queue);
+      runTestsInSeries(environment, environmentName, queue);
     }, config.testInterval);
 
   });
@@ -19,10 +19,21 @@ var startWorker = function(queue) {
 // runs tests in series, waiting for each response to come back
 // before calling the next one.
 
-function runTestsInSeries(service, serviceName, screenrQueue) {
-  testNames = Object.keys(service);
-  var tests = testNames.map(function(testName) {
-    return function(cb) {runTest(service[testName], testName, serviceName, screenrQueue, cb);};
+function runTestsInSeries(environment, environmentName, screenrQueue) {
+  endpointNames = Object.keys(environment);
+
+  var tests = [];
+
+  endpointNames.forEach(function(endpointName) {
+    testNames = Object.keys(environment[endpointName]);
+    testNames.forEach(function(testName) {
+      tests.push(
+        function(cb) { 
+          runTest(environment[endpointName][testName], 
+            environmentName, endpointName, testName, screenrQueue, cb); 
+        }
+      );
+    });
   });
 
   async.series(tests);
@@ -31,7 +42,7 @@ function runTestsInSeries(service, serviceName, screenrQueue) {
 // runs .execute() on a test, stores response time and response
 // in a new TestResult
 
-function runTest(test, name, serviceName, screenrQueue, callback) {
+function runTest(test, environmentName, endpointName, testName, screenrQueue, callback) {
   // first, run test.before(), and pass results (before) to test.execute()
   
   if (test.before) {
@@ -43,7 +54,7 @@ function runTest(test, name, serviceName, screenrQueue, callback) {
 
   function execute(before) {
     var beginTime = Date.now();
-    console.log(beginTime, 'running test:', name);
+    console.log(beginTime, 'running test:', endpointName, testName);
 
     test.execute(function(err, response) {
       var endTime = Date.now();
@@ -52,8 +63,9 @@ function runTest(test, name, serviceName, screenrQueue, callback) {
       // save err, response in new TestResult object.
 
       var testResult = new db.TestResult({
-        testId: name,
-        serviceName: serviceName, //production or sandbox
+        environmentName: environmentName, //production or sandbox
+        endpointName: endpointName,
+        testName: testName,
         error: err,
         timeStart: Date(beginTime),
         timeEnd: Date(endTime),
@@ -67,7 +79,7 @@ function runTest(test, name, serviceName, screenrQueue, callback) {
 
       testResult.save();
 
-      // console.log(testResult);
+      console.log(testResult);
 
       // notify screenr of this new TestResult
       screenrQueue.push(testResult);
