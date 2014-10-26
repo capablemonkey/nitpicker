@@ -7,6 +7,7 @@ var TIME_WINDOW = {
   '1-month': 1000 * 60 * 60 * 24 * 7
 };
 var SESSION_PREFIX_AVERAGE_RESPONSE_TIME = "avgResponseTime_";
+var SESSION_PREFIX_MAX_RESPONSE_TIME = "maxResponseTime_";
 
 if (Meteor.isClient) {
   Session.setDefault("timeWindow", '24-hours');
@@ -41,9 +42,15 @@ if (Meteor.isClient) {
       // 'Basic Account Info' -> 'basic-account-info'
       return Template.instance().data.endpointName.toLowerCase().split(' ').join('-');
     },
+    // TODO: add max response time past hour
+    // TODO: make sure we wait for each response time come back before trying again
     averageResponseTime: function() {
       var endpointName = Template.instance().data.endpointName;
       return Session.get(SESSION_PREFIX_AVERAGE_RESPONSE_TIME + endpointName) || "Loading";
+    },
+    maxResponseTime: function() {
+      var endpointName = Template.instance().data.endpointName;
+      return Session.get(SESSION_PREFIX_MAX_RESPONSE_TIME + endpointName) || "Loading";
     },
     getEvents: function() {
       // Retrieve events for this endpoint within the past 24 hours, 7 days, etc.
@@ -132,6 +139,10 @@ if (Meteor.isClient) {
       Meteor.call('getAverageResponseTime', endpointName, timeWindowInMS, function(err, result) {
         Session.set(SESSION_PREFIX_AVERAGE_RESPONSE_TIME + endpointName, formatResponseTime(result));
       });
+
+      Meteor.call('getMaxResponseTime', endpointName, timeWindowInMS, function(err, result) {
+        Session.set(SESSION_PREFIX_MAX_RESPONSE_TIME + endpointName, formatResponseTime(result));
+      });
     });
   };
 
@@ -197,6 +208,7 @@ if (Meteor.isServer) {
   Meteor.methods({
     getAverageResponseTime: function(endpointName, timeWindow) {
       // TODO: consider using mapreduce here...
+      // TODO: consider caching this calulation for windows greater than 24 hours...
 
       var timeThreshold = new Date(new Date() - timeWindow);
       var results = TestResult.find({testId: endpointName, timeStart: {$gte: timeThreshold}}, {});
@@ -209,6 +221,17 @@ if (Meteor.isServer) {
       }, 0) / responseTimes.length;
 
       return averageResponseTime;
+    },
+    getMaxResponseTime: function(endpointName, timeWindow) {
+      var timeThreshold = new Date(new Date() - timeWindow);
+      var result = TestResult.findOne({
+        testId: endpointName, 
+        timeStart: {$gte: timeThreshold}
+      }, {
+        sort: {responseTime: -1}
+      });
+
+      return result.responseTime;
     }
   });
 
