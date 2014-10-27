@@ -1,5 +1,5 @@
 // Graph Y axis's max and min
-var GRAPH_Y_AXIS_MAX_RESPONSE_TIME = 1500;
+var GRAPH_Y_AXIS_MAX_RESPONSE_TIME = 2000;
 var GRAPH_Y_AXIS_MIN_RESPONSE_TIME = 0;
 
 // conversion of time windows to milliseconds time delta
@@ -213,7 +213,7 @@ if (Meteor.isServer) {
         timeStart: {$gte: timeThreshold},
         error: null
       }, {});
-      
+
       var responseTimes = results.map(function(result, index) {
         return result.responseTime;
       });
