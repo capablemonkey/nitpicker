@@ -1,6 +1,6 @@
 # nitpicker
 
-nitpicker is funtional API monitoring tool that doesn't just ping a machine; it runs integration tests against the API periodially, and provides a public, real time interface to hold you accountable to your users.
+nitpicker is functional API monitoring tool that doesn't just ping a machine; it runs functional tests against the API periodially, and provides a web interface for your users to scrutinize the health and performance of your system in real-time and in the past.
 
 nitpicker detects anomalies in the form of failed tests or unusually high response times, and will send SMS, email, and twitter notifications to anyone that subscribes to them.
 
