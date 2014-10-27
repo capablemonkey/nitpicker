@@ -69,7 +69,6 @@ if (Meteor.isClient) {
       // on the key testName.  However, it is conceivable for an endpoint to have more than 10
       // different tests, in which case we would only return 10 or less tests.
       var results = TestResult.find({endpointName: endpointName}, {limit: 10, sort: {timeStart: -1}}).fetch();
-      console.log('tests....', results);
       return _.uniq(results, false, function(result) { return result.testName; });
     },
     getEvents: function() {
