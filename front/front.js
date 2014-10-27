@@ -101,7 +101,10 @@ if (Meteor.isClient) {
     // Every time a new test result for this endpoint is added,
     // update the graph and response times:
     this.autorun(function() {
-      results = TestResult.find({endpointName: endpointName}, {limit: 100});
+      results = TestResult.find({
+        endpointName: endpointName,
+        error: null
+      }, {limit: 100});
 
       data = results.map(function(result) {
         return {
@@ -187,9 +190,6 @@ if (Meteor.isServer) {
     TestResult = new Meteor.Collection("testresults");
   });
 
-  // TODO: implement server side methods to calculate average response time over 24 hours, 7 days, 1 month
-  // use Meteor.call() on client side
-
   Meteor.publish('testResultz', function(limit) {
     return TestResult.find({}, { limit: limit, sort: {timeStart: -1}});
   });
@@ -208,7 +208,12 @@ if (Meteor.isServer) {
       // TODO: consider caching this calulation for windows greater than 24 hours...
 
       var timeThreshold = new Date(new Date() - timeWindow);
-      var results = TestResult.find({endpointName: endpointName, timeStart: {$gte: timeThreshold}}, {});
+      var results = TestResult.find({
+        endpointName: endpointName, 
+        timeStart: {$gte: timeThreshold},
+        error: null
+      }, {});
+      
       var responseTimes = results.map(function(result, index) {
         return result.responseTime;
       });
@@ -223,7 +228,8 @@ if (Meteor.isServer) {
       var timeThreshold = new Date(new Date() - timeWindow);
       var result = TestResult.findOne({
         endpointName: endpointName, 
-        timeStart: {$gte: timeThreshold}
+        timeStart: {$gte: timeThreshold},
+        error: null
       }, {
         sort: {responseTime: -1}
       });
