@@ -66,7 +66,7 @@ function runTest(test, environmentName, endpointName, testName, screenrQueue, ca
         environmentName: environmentName, //production or sandbox
         endpointName: endpointName,
         testName: testName,
-        error: err,
+        error: err ? err.toString() : err,
         timeStart: Date(beginTime),
         timeEnd: Date(endTime),
         responseTime: responseTime,
