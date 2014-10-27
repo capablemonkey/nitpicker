@@ -107,7 +107,11 @@ function validateTiming(testResult, done) {
 
   });
 }
+
+
+
 /* two part evaluation of the testResult,
+  zeroth (TODO) - check to see if the testResult included an Error.
   first - runs the criteria (throw will occur with any issues)
   second - runs the timing validation
           which averages the last several
@@ -119,7 +123,9 @@ otherwise nothing will happen */
 function evaluateTest(testResult) {
   var testRoutine = tests[testResult.environmentName][testResult.endpointName][testResult.testName];
 
-  try {
+  try { 
+    // TODO: check to see if the testResult had an Error.  If so, create an event about a failed test.
+
     testRoutine.criteria(testResult,function() { 
       validateTiming(testResult, function() {
 

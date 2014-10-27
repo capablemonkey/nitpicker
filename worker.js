@@ -79,7 +79,7 @@ function runTest(test, environmentName, endpointName, testName, screenrQueue, ca
 
       testResult.save();
 
-      console.log(testResult);
+      // console.log(testResult);
 
       // notify screenr of this new TestResult
       screenrQueue.push(testResult);

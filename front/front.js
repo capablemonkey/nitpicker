@@ -35,8 +35,9 @@ if (Meteor.isClient) {
       // TODO: get list of tests dynamically instead of hardcoding
 
       return [
-        {name: 'Basic Account Info'}, 
+        {name: 'Send Money'},
         {name: 'Balance'},
+        {name: 'Basic Account Info'}, 
         {name: 'Full Account Info'}
       ];
     }

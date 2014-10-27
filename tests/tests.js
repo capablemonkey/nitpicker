@@ -70,6 +70,26 @@ tests.sandbox = {
 		}
 	},
 
+	'Send Money': {
+		'Request is successful and response is valid': {
+			config: {
+				responseTimeThreshold: 5000
+			},
+			execute: function(done, before) {
+				dwolla.setToken(config.accessToken);
+	      dwolla.send(config.pin, config.merchantDwollaID, '0.01', done);
+			},
+			criteria: function(testResult, done) {
+				(testResult.error == null).should.be.true;
+				response = testResult.response.body;
+
+				response.should.be.a.Number
+          .above(0);
+        done();
+			}
+		}
+	},
+
 	'Basic Account Info': {
 		'Request is successful and response is valid': {
 			config: {
@@ -126,40 +146,41 @@ tests.sandbox = {
 		}
 	},
 
-	'cause screenr to report an Error': {
-		'Request is successful and response is valid': {
-			config: {
-				responseTimeThreshold: 5000
-			},
-			execute: function(done) {
-				dwolla.setToken(config.accessToken);
-	      /* 
-	      	causes the first five calls to be very slow.
-	      	This is to test the functionality in screenr
-	      	to create and resolve Events 
-	      */
-	      if (counter < 5) {
-	        counter++;
-	        setTimeout(function() {
-	          dwolla.balance(done);
-	        },6000);
-	      } 
-	      else {
-	        dwolla.balance(done);
-	      }
-			},
-			criteria: function(testResult, done) {
-				(testResult.error == null).should.be.true;
+	// 'cause screenr to report an Error': {
+	// 	'Request is successful and response is valid': {
+	// 		config: {
+	// 			responseTimeThreshold: 5000
+	// 		},
+	// 		execute: function(done) {
+	// 			dwolla.setToken(config.accessToken);
+	//       /* 
+	//       	causes the first five calls to be very slow.
+	//       	This is to test the functionality in screenr
+	//       	to create and resolve Events 
+	//       */
+	//       if (counter < 5) {
+	//         counter++;
+	//         setTimeout(function() {
+	//           dwolla.balance(done);
+	//         },6000);
+	//       } 
+	//       else {
+	//         dwolla.balance(done);
+	//       }
+	// 		},
+	// 		criteria: function(testResult, done) {
+	// 			(testResult.error == null).should.be.true;
 
-				// sample balance: 28041.6
-				response = testResult.response.body;
-				response.should.be.a.Number
-	        .and.above(0);
+	// 			// sample balance: 28041.6
+	// 			response = testResult.response.body;
+	// 			response.should.be.a.Number
+	//         .and.above(0);
 
-	      done();
-			}
-		}
-	}
+	//       done();
+	// 		}
+	// 	}
+	// }
+	
 };
 
 tests.production = {
