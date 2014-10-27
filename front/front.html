@@ -16,19 +16,18 @@
 
 <body>
   <div class="container">
-    <h1>nitpicker!</h1>
-
     {{> hello}}
     <!-- {{> testResults }} -->
-
     {{> endpointsStats}}
-
     <!-- {{> nitpickerEvents}} -->
   </div>
   
+  {{> subscriptionModal }}
 </body>
 
 <template name="hello">
+<div class="jumbotron">
+  <h1>nitpicker!</h1>
   <button name="1-hour">Past 1 hour</button>
   <button name="24-hours">Past 24 hours</button>
   <button name="7-days">Past week</button>
@@ -37,6 +36,12 @@
   <p>Showing past {{timeWindow}}.</p>
 
   <p>Last updated: <time class="timeago" datetime="{{lastUpdated ISO=true}}"></time>.</p>
+
+  <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal">
+    Get notified
+  </button>
+</div>
+  
 </template>
 
 <template name="testResults">
@@ -60,18 +65,32 @@
 <div class="row">
   <h3>{{endpointName}}</h3>
 
-  <div class="col-md-3">
-    <div class="well">
+  <div class="col-md-4">
+    <div class="panel">
       <span class="averageResponseTimeValue">{{ averageResponseTime }}</span>
       <p>average response time</p>
     </div>
-    <div class="well">
+    <div class="panel">
       <span class="averageResponseTimeValue">{{ maxResponseTime }}</span>
       <p>max response time</p>
     </div>
+
+    <div> 
+    <h4>Tests</h4>
+      <ul>
+      {{#each getLatestTestResults}}
+        <li>{{testName}} 
+        {{#unless error}}
+          <span class="label label-success">Pass</span>
+        {{else}}
+          <span class="label label-success">Fail</span>
+        {{/unless}}</li>
+      {{/each}}
+      </ul>
+    </div>
     
     
-    <a>Events:</a>
+    <h4>Events</h4>
 
     <ul>
     {{#each getEvents}}
@@ -79,7 +98,7 @@
     {{/each}}
     </ul>
   </div>
-  <div class="col-md-9">
+  <div class="col-md-8">
     <div class="graph_container">
       <div class="y-axis" id="y-{{ DOMName }}"></div>
       <div class="graph" id="graph-{{ DOMName }}"></div>
@@ -94,4 +113,20 @@
   {{#each getEvents}}
     <div>{{serviceName}}: issue with "{{testId}}": {{description}} | {{createdDate}} | {{resolved}}</div>
   {{/each}}
+</template>
+
+<template name="subscriptionModal">
+  <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="myModalLabel">Subscribe to notifications</h4>
+        </div>
+        <div class="modal-body">
+          Feature coming soon!
+        </div>
+      </div>
+    </div>
+  </div>
 </template>

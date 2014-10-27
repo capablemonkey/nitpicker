@@ -61,6 +61,16 @@ if (Meteor.isClient) {
       var endpointName = Template.instance().data.endpointName;
       return Session.get(SESSION_PREFIX_MAX_RESPONSE_TIME + endpointName) || "Loading";
     },
+    getLatestTestResults: function() {
+      var endpointName = Template.instance().data.endpointName;
+      // NOTE: this is not the best way to retrieve the latest TestResult per test per endpoint.
+      // We are plucking out the latest 10 TestResults for the endpoint and removing duplicates
+      // on the key testName.  However, it is conceivable for an endpoint to have more than 10
+      // different tests, in which case we would only return 10 or less tests.
+      var results = TestResult.find({endpointName: endpointName}, {limit: 10, sort: {timeStart: -1}}).fetch();
+      console.log('tests....', results);
+      return _.uniq(results, false, function(result) { return result.testName; });
+    },
     getEvents: function() {
       // Retrieve events for this endpoint within the past 24 hours, 7 days, etc.
 
